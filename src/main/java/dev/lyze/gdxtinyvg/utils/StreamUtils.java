@@ -2,7 +2,6 @@ package dev.lyze.gdxtinyvg.utils;
 
 import com.badlogic.gdx.utils.LittleEndianInputStream;
 import java.io.IOException;
-import lombok.var;
 
 public class StreamUtils {
     /**
@@ -15,20 +14,16 @@ public class StreamUtils {
      * @return The actual int value of the VarUInt.
      */
     public static int readVarUInt(LittleEndianInputStream stream) throws IOException {
-        var count = 0;
-        var result = 0;
-
+        int count = 0;
+        int result = 0;
         while (true) {
-            var b = stream.readUnsignedByte();
-            var val = (b & 0x7F) << (7 * count);
+            int b = stream.readUnsignedByte();
+            int val = (b & 127) << (7 * count);
             result |= val;
-
-            if ((b & 0x80) == 0)
+            if ((b & 128) == 0)
                 break;
-
             count++;
         }
-
         return result;
     }
 
@@ -40,11 +35,9 @@ public class StreamUtils {
      * @return A byte array of all the read bytes.
      */
     public static int[] readNBytes(LittleEndianInputStream stream, int amount) throws IOException {
-        var bytes = new int[amount];
-
+        int[] bytes = new int[amount];
         for (int i = 0; i < amount; i++)
             bytes[i] = stream.readUnsignedByte();
-
         return bytes;
     }
 }

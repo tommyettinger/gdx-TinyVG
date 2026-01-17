@@ -9,7 +9,6 @@ import dev.lyze.gdxtinyvg.drawers.TinyVGShapeDrawer;
 import dev.lyze.gdxtinyvg.enums.CommandType;
 import dev.lyze.gdxtinyvg.enums.StyleType;
 import java.io.IOException;
-import lombok.var;
 
 public class DrawLinePathCommand extends Command {
     private PathHeader header;
@@ -27,8 +26,7 @@ public class DrawLinePathCommand extends Command {
     @Override
     public void draw(TinyVGShapeDrawer drawer) {
         drawer.setStyle(header.getPrimaryStyle());
-
-        for (var segment : header.getSegments())
+        for (dev.lyze.gdxtinyvg.types.ParsedPathSegment segment : header.getSegments())
             segment.getCache().path(drawer, segment.getPoints().get(0).getWidth(),
                     !(segment.getLastCommand() instanceof UnitPathCloseCommand));
     }

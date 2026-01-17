@@ -2,13 +2,10 @@ package dev.lyze.gdxtinyvg.enums;
 
 import com.badlogic.gdx.utils.LittleEndianInputStream;
 import java.io.IOException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
  * The coordinate range defines how many bits a Unit value uses.
  */
-@AllArgsConstructor
 public enum Range {
     /**
      * Each Unit takes up 16 bit.
@@ -23,7 +20,7 @@ public enum Range {
      */
     ENHANCED(2);
 
-    @Getter private final int value;
+    private final int value;
 
     /**
      * Converts the stored int index to the enum.
@@ -35,7 +32,6 @@ public enum Range {
         for (Range range : values())
             if (range.value == value)
                 return range;
-
         throw new IllegalArgumentException(String.valueOf(value));
     }
 
@@ -56,5 +52,13 @@ public enum Range {
             default:
                 throw new IllegalArgumentException("Unknown enum value");
         }
+    }
+
+    private Range(final int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return this.value;
     }
 }

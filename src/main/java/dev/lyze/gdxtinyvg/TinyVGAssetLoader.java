@@ -16,7 +16,6 @@ import dev.lyze.gdxtinyvg.enums.CommandType;
 import dev.lyze.gdxtinyvg.enums.StyleType;
 import java.io.IOException;
 import java.io.InputStream;
-import lombok.var;
 
 public class TinyVGAssetLoader extends AsynchronousAssetLoader<TinyVG, TinyVGAssetLoader.TinyVGParameter> {
     private TinyVG tvg;
@@ -52,11 +51,9 @@ public class TinyVGAssetLoader extends AsynchronousAssetLoader<TinyVG, TinyVGAss
     }
 
     private TinyVG loadInternal(LittleEndianInputStream stream) throws IOException {
-        var header = new TinyVGHeader();
+        TinyVGHeader header = new TinyVGHeader();
         header.read(stream);
-
-        var tinyVg = new TinyVG(header, readColorTable(header, stream));
-
+        TinyVG tinyVg = new TinyVG(header, readColorTable(header, stream));
         Command command;
         do {
             command = readCommand(stream, tinyVg);
@@ -67,24 +64,20 @@ public class TinyVGAssetLoader extends AsynchronousAssetLoader<TinyVG, TinyVGAss
             }
             tinyVg.addCommand(command);
         } while (command.getType() != CommandType.END_OF_DOCUMENT);
-
         return tinyVg;
     }
 
     private Command readCommand(LittleEndianInputStream stream, TinyVG tinyVG) throws IOException {
-        var commandStyleByte = stream.readUnsignedByte();
-        var commandType = CommandType.valueOf(commandStyleByte & 0b0011_1111);
-        var styleType = StyleType.valueOf((commandStyleByte & 0b1100_0000) >> 6);
-
+        int commandStyleByte = stream.readUnsignedByte();
+        CommandType commandType = CommandType.valueOf(commandStyleByte & 63);
+        StyleType styleType = StyleType.valueOf((commandStyleByte & 192) >> 6);
         return commandType.read(stream, styleType, tinyVG);
     }
 
     private Color[] readColorTable(TinyVGHeader header, LittleEndianInputStream stream) throws IOException {
-        var table = new Color[header.getColorTableCount()];
-
+        Color[] table = new Color[header.getColorTableCount()];
         for (int i = 0; i < table.length; i++)
             table[i] = header.getColorEncoding().read(stream);
-
         return table;
     }
 

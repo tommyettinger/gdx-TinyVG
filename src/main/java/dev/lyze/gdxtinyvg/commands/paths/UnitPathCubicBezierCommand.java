@@ -10,7 +10,6 @@ import dev.lyze.gdxtinyvg.types.Unit;
 import dev.lyze.gdxtinyvg.types.UnitPoint;
 import dev.lyze.gdxtinyvg.types.Vector2WithWidth;
 import java.io.IOException;
-import lombok.var;
 
 /**
  * The cubic bezier instruction draws a Bézier curve with two control points.
@@ -24,7 +23,6 @@ public class UnitPathCubicBezierCommand extends UnitPathCommand {
      * The second control point.
      */
     private Vector2 control2;
-
     /**
      * The end point of the Bézier curve.
      */
@@ -36,9 +34,8 @@ public class UnitPathCubicBezierCommand extends UnitPathCommand {
 
     @Override
     public void read(LittleEndianInputStream stream) throws IOException {
-        var range = getTinyVG().getHeader().getCoordinateRange();
-        var fractionBits = getTinyVG().getHeader().getFractionBits();
-
+        dev.lyze.gdxtinyvg.enums.Range range = getTinyVG().getHeader().getCoordinateRange();
+        int fractionBits = getTinyVG().getHeader().getFractionBits();
         control1 = new UnitPoint(stream, range, fractionBits).convert();
         control2 = new UnitPoint(stream, range, fractionBits).convert();
         end = new UnitPoint(stream, range, fractionBits).convert();
@@ -46,11 +43,10 @@ public class UnitPathCubicBezierCommand extends UnitPathCommand {
 
     @Override
     public Array<Vector2WithWidth> calculatePoints(Vector2 start, float lastLineWidth, Array<Vector2WithWidth> path) {
-        var tmp = new Vector2();
-
+        Vector2 tmp = new Vector2();
         for (int i = 0; i < getTinyVG().getCurvePoints(); i++) {
-            var cubic = Bezier.cubic(new Vector2(), (float) i / getTinyVG().getCurvePoints(), start, control1, control2,
-                    end, tmp);
+            Vector2 cubic = Bezier.cubic(new Vector2(), (float) i / getTinyVG().getCurvePoints(), start, control1,
+                    control2, end, tmp);
             path.add(new Vector2WithWidth(cubic, calculateLineWidth(lastLineWidth)));
         }
         return path;

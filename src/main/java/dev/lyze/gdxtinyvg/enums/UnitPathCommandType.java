@@ -5,10 +5,7 @@ import dev.lyze.gdxtinyvg.TinyVG;
 import dev.lyze.gdxtinyvg.commands.paths.*;
 import dev.lyze.gdxtinyvg.types.Unit;
 import java.io.IOException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor
 public enum UnitPathCommandType {
     /**
      * A straight line is drawn from the current point to a new point.
@@ -45,7 +42,7 @@ public enum UnitPathCommandType {
      */
     QUADRATIC_BEZIER(7);
 
-    @Getter private final int value;
+    private final int value;
 
     /**
      * Converts the stored int index to the enum.
@@ -57,7 +54,6 @@ public enum UnitPathCommandType {
         for (UnitPathCommandType range : values())
             if (range.value == value)
                 return range;
-
         throw new IllegalArgumentException(String.valueOf(value));
     }
 
@@ -69,7 +65,6 @@ public enum UnitPathCommandType {
      */
     public UnitPathCommand read(LittleEndianInputStream stream, Unit lineWidth, TinyVG tinyVG) throws IOException {
         UnitPathCommand command;
-
         switch (this) {
             case LINE:
                 command = new UnitPathLineCommand(lineWidth, tinyVG);
@@ -98,9 +93,15 @@ public enum UnitPathCommandType {
             default:
                 throw new IllegalArgumentException("Unknown enum");
         }
-
         command.read(stream);
-
         return command;
+    }
+
+    private UnitPathCommandType(final int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return this.value;
     }
 }

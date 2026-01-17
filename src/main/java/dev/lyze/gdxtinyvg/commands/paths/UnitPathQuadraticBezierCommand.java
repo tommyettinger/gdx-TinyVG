@@ -10,7 +10,6 @@ import dev.lyze.gdxtinyvg.types.Unit;
 import dev.lyze.gdxtinyvg.types.UnitPoint;
 import dev.lyze.gdxtinyvg.types.Vector2WithWidth;
 import java.io.IOException;
-import lombok.var;
 
 /**
  * The quadratic bezier instruction draws a Bézier curve with a single control
@@ -21,7 +20,6 @@ public class UnitPathQuadraticBezierCommand extends UnitPathCommand {
      * The control point.
      */
     private UnitPoint control1;
-
     /**
      * The end point of the Bézier curve.
      */
@@ -33,24 +31,21 @@ public class UnitPathQuadraticBezierCommand extends UnitPathCommand {
 
     @Override
     public void read(LittleEndianInputStream stream) throws IOException {
-        var range = getTinyVG().getHeader().getCoordinateRange();
-        var fractionBits = getTinyVG().getHeader().getFractionBits();
-
+        dev.lyze.gdxtinyvg.enums.Range range = getTinyVG().getHeader().getCoordinateRange();
+        int fractionBits = getTinyVG().getHeader().getFractionBits();
         control1 = new UnitPoint(stream, range, fractionBits);
         end = new UnitPoint(stream, range, fractionBits);
     }
 
     @Override
     public Array<Vector2WithWidth> calculatePoints(Vector2 start, float lastLineWidth, Array<Vector2WithWidth> path) {
-        var tmp = new Vector2();
-        var startVector = start.cpy();
-        var endVector = end.convert();
-        var control1Vector = control1.convert();
-
+        Vector2 tmp = new Vector2();
+        Vector2 startVector = start.cpy();
+        Vector2 endVector = end.convert();
+        Vector2 control1Vector = control1.convert();
         for (int i = 0; i < getTinyVG().getCurvePoints(); i++)
             path.add(new Vector2WithWidth(Bezier.quadratic(new Vector2(), (float) i / getTinyVG().getCurvePoints(),
                     startVector, control1Vector, endVector, tmp), calculateLineWidth(lastLineWidth)));
-
         return path;
     }
 }

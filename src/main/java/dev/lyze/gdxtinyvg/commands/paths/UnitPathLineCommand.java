@@ -9,7 +9,6 @@ import dev.lyze.gdxtinyvg.types.Unit;
 import dev.lyze.gdxtinyvg.types.UnitPoint;
 import dev.lyze.gdxtinyvg.types.Vector2WithWidth;
 import java.io.IOException;
-import lombok.var;
 
 /**
  * The line instruction draws a straight line to the position.
@@ -26,9 +25,8 @@ public class UnitPathLineCommand extends UnitPathCommand {
 
     @Override
     public void read(LittleEndianInputStream stream) throws IOException {
-        var range = getTinyVG().getHeader().getCoordinateRange();
-        var fractionBits = getTinyVG().getHeader().getFractionBits();
-
+        dev.lyze.gdxtinyvg.enums.Range range = getTinyVG().getHeader().getCoordinateRange();
+        int fractionBits = getTinyVG().getHeader().getFractionBits();
         position = new UnitPoint(stream, range, fractionBits).convert();
     }
 

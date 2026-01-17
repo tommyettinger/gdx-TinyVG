@@ -8,9 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import dev.lyze.gdxtinyvg.enums.StyleType;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.var;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 /**
@@ -18,18 +15,17 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
  * gradient shader.
  */
 public class GradientShapeDrawer extends ShapeDrawer implements Disposable {
-    @Getter private final Color startColor = Color.BLACK.cpy(), endColor = Color.WHITE.cpy();
-    @Getter @Setter private StyleType gradientStyle = StyleType.FLAT;
-    @Getter private final Vector2 startPosition = new Vector2(), endPosition = new Vector2();
-
+    private final Color startColor = Color.BLACK.cpy();
+    private final Color endColor = Color.WHITE.cpy();
+    private StyleType gradientStyle = StyleType.FLAT;
+    private final Vector2 startPosition = new Vector2();
+    private final Vector2 endPosition = new Vector2();
     private final ShaderProgram shader;
 
     public GradientShapeDrawer(Batch batch, TextureRegion region) {
         super(batch, region);
-
         ShaderProgram.pedantic = false; // todo remove
         shader = new ShaderProgram(ShaderFile.vertex, ShaderFile.fragment);
-
         if (!shader.isCompiled())
             throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
     }
@@ -60,11 +56,9 @@ public class GradientShapeDrawer extends ShapeDrawer implements Disposable {
      * position, color or style.
      */
     public void applyShaderValues() {
-        var width = endPosition.x - startPosition.x;
-        var height = endPosition.y - startPosition.y;
-
+        float width = endPosition.x - startPosition.x;
+        float height = endPosition.y - startPosition.y;
         shader.bind();
-
         shader.setUniformf("u_startColor", startColor);
         shader.setUniformf("u_endColor", endColor);
         shader.setUniformf("u_startPosition", startPosition);
@@ -88,5 +82,29 @@ public class GradientShapeDrawer extends ShapeDrawer implements Disposable {
     @Override
     public void dispose() {
         shader.dispose();
+    }
+
+    public Color getStartColor() {
+        return this.startColor;
+    }
+
+    public Color getEndColor() {
+        return this.endColor;
+    }
+
+    public StyleType getGradientStyle() {
+        return this.gradientStyle;
+    }
+
+    public void setGradientStyle(final StyleType gradientStyle) {
+        this.gradientStyle = gradientStyle;
+    }
+
+    public Vector2 getStartPosition() {
+        return this.startPosition;
+    }
+
+    public Vector2 getEndPosition() {
+        return this.endPosition;
     }
 }

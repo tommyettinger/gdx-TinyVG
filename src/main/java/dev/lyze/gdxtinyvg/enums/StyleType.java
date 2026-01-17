@@ -7,13 +7,10 @@ import dev.lyze.gdxtinyvg.styles.LinearGradientStyle;
 import dev.lyze.gdxtinyvg.styles.RadialGradientStyle;
 import dev.lyze.gdxtinyvg.styles.Style;
 import java.io.IOException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
  * Color style of the drawn shape.
  */
-@AllArgsConstructor
 public enum StyleType {
     /**
      * The shape is uniformly colored with a single color.
@@ -51,7 +48,7 @@ public enum StyleType {
      */
     RADIAL(2);
 
-    @Getter private final int value;
+    private final int value;
 
     /**
      * Converts the stored int index to the enum.
@@ -63,7 +60,6 @@ public enum StyleType {
         for (StyleType styleType : values())
             if (styleType.value == value)
                 return styleType;
-
         throw new IllegalArgumentException(String.valueOf(value));
     }
 
@@ -76,7 +72,6 @@ public enum StyleType {
      */
     public Style read(LittleEndianInputStream stream, TinyVG tinyVG) throws IOException {
         Style style;
-
         switch (this) {
             case FLAT:
                 style = new FlatColoredStyle(tinyVG);
@@ -90,9 +85,15 @@ public enum StyleType {
             default:
                 throw new IllegalArgumentException("Unknown enum");
         }
-
         style.read(stream, tinyVG.getHeader().getCoordinateRange(), tinyVG.getHeader().getFractionBits());
-
         return style;
+    }
+
+    private StyleType(final int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return this.value;
     }
 }

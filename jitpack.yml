@@ -1,0 +1,5 @@
+before_install:
+  - sdk install java 8-open
+  - sdk use java 8-open
+jdk:
+  - openjdk8

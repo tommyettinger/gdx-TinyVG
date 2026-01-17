@@ -8,7 +8,6 @@ import dev.lyze.gdxtinyvg.enums.CommandType;
 import dev.lyze.gdxtinyvg.enums.StyleType;
 import dev.lyze.gdxtinyvg.types.UnitRectangle;
 import java.io.IOException;
-import lombok.var;
 
 /**
  * Fills a list of rectangles.
@@ -28,7 +27,7 @@ public class FillRectanglesCommand extends Command {
     @Override
     public void draw(TinyVGShapeDrawer drawer) {
         drawer.setStyle(header.getPrimaryStyle());
-        for (var rectangle : header.getData())
+        for (UnitRectangle rectangle : header.getData())
             drawer.filledRectangle(rectangle, getTinyVG());
     }
 }

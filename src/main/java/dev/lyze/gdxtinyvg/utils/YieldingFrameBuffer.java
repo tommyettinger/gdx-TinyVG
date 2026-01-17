@@ -3,7 +3,6 @@ package dev.lyze.gdxtinyvg.utils;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import lombok.var;
 
 public class YieldingFrameBuffer extends FrameBuffer {
     private boolean yielding = false;
@@ -19,7 +18,7 @@ public class YieldingFrameBuffer extends FrameBuffer {
     }
 
     public Texture disposeAndTakeColorTexture() {
-        var r = getColorBufferTexture();
+        Texture r = getColorBufferTexture();
         yielding = true;
         dispose();
         return r;

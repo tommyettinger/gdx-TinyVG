@@ -6,10 +6,9 @@ import dev.lyze.gdxtinyvg.TinyVG;
 import dev.lyze.gdxtinyvg.drawers.GradientShapeDrawer;
 import dev.lyze.gdxtinyvg.enums.Range;
 import java.io.IOException;
-import lombok.Getter;
 
 public abstract class Style {
-    @Getter private final TinyVG tinyVG;
+    private final TinyVG tinyVG;
 
     public Style(TinyVG tinyVG) {
         this.tinyVG = tinyVG;
@@ -21,5 +20,9 @@ public abstract class Style {
 
     public void end(GradientShapeDrawer drawer) {
         drawer.getBatch().flush();
+    }
+
+    public TinyVG getTinyVG() {
+        return this.tinyVG;
     }
 }

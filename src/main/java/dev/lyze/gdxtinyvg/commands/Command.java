@@ -6,11 +6,10 @@ import dev.lyze.gdxtinyvg.drawers.TinyVGShapeDrawer;
 import dev.lyze.gdxtinyvg.enums.CommandType;
 import dev.lyze.gdxtinyvg.enums.StyleType;
 import java.io.IOException;
-import lombok.Getter;
 
 public abstract class Command {
-    @Getter private final CommandType type;
-    @Getter private final TinyVG tinyVG;
+    private final CommandType type;
+    private final TinyVG tinyVG;
 
     public Command(CommandType type, TinyVG tinyVG) {
         this.type = type;
@@ -22,6 +21,13 @@ public abstract class Command {
     public abstract void draw(TinyVGShapeDrawer drawer);
 
     public void onPropertiesChanged() {
+    }
 
+    public CommandType getType() {
+        return this.type;
+    }
+
+    public TinyVG getTinyVG() {
+        return this.tinyVG;
     }
 }

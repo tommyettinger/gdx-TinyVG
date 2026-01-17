@@ -4,21 +4,17 @@ import com.badlogic.gdx.utils.LittleEndianInputStream;
 import dev.lyze.gdxtinyvg.TinyVG;
 import dev.lyze.gdxtinyvg.commands.*;
 import java.io.IOException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
  * TinyVG files contain a sequence of draw commands that must be executed in the
  * defined order to get the final result. Each draw command adds a new 2D
  * primitive to the graphic.
  */
-@AllArgsConstructor
 public enum CommandType {
     /**
      * This command determines the end of file.
      */
     END_OF_DOCUMENT(0),
-
     /**
      * This command fills an N-gon.
      */
@@ -31,7 +27,6 @@ public enum CommandType {
      * This command fills a free-form path.
      */
     FILL_PATH(3),
-
     /**
      * This command draws a set of lines.
      */
@@ -48,7 +43,6 @@ public enum CommandType {
      * This command draws a free-form path.
      */
     DRAW_LINE_PATH(7),
-
     /**
      * This command draws a filled polygon with an outline.
      */
@@ -62,7 +56,7 @@ public enum CommandType {
      */
     OUTLINE_FILL_PATH(10);
 
-    @Getter private final int value;
+    private final int value;
 
     /**
      * Converts the stored int index to the enum.
@@ -76,7 +70,6 @@ public enum CommandType {
                 return command;
             }
         }
-
         throw new IllegalArgumentException(String.valueOf(value));
     }
 
@@ -90,7 +83,6 @@ public enum CommandType {
      */
     public Command read(LittleEndianInputStream stream, StyleType styleType, TinyVG tinyVG) throws IOException {
         Command command;
-
         switch (this) {
             case END_OF_DOCUMENT:
                 command = new EndOfDocumentCommand(tinyVG);
@@ -128,9 +120,15 @@ public enum CommandType {
             default:
                 throw new IllegalArgumentException("Unknown enum");
         }
-
         command.read(stream, styleType);
-
         return command;
+    }
+
+    private CommandType(final int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return this.value;
     }
 }

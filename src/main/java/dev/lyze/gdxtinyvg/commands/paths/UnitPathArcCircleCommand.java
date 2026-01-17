@@ -10,7 +10,6 @@ import dev.lyze.gdxtinyvg.types.Unit;
 import dev.lyze.gdxtinyvg.types.UnitPoint;
 import dev.lyze.gdxtinyvg.types.Vector2WithWidth;
 import java.io.IOException;
-import lombok.var;
 
 /**
  * Draws an circle segment between the current and the target point.
@@ -39,60 +38,43 @@ public class UnitPathArcCircleCommand extends UnitPathCommand {
 
     @Override
     public void read(LittleEndianInputStream stream) throws IOException {
-        var range = getTinyVG().getHeader().getCoordinateRange();
-        var fractionBits = getTinyVG().getHeader().getFractionBits();
-
-        var largeArcSweepPaddingByte = stream.readUnsignedByte();
-
-        largeArc = (largeArcSweepPaddingByte & 0b0000_0001) == 1;
-        sweep = ((largeArcSweepPaddingByte & 0b0000_0010) >> 1) == 1;
-
+        dev.lyze.gdxtinyvg.enums.Range range = getTinyVG().getHeader().getCoordinateRange();
+        int fractionBits = getTinyVG().getHeader().getFractionBits();
+        int largeArcSweepPaddingByte = stream.readUnsignedByte();
+        largeArc = (largeArcSweepPaddingByte & 1) == 1;
+        sweep = ((largeArcSweepPaddingByte & 2) >> 1) == 1;
         radius = new Unit(stream, range, fractionBits).convert();
-
         target = new UnitPoint(stream, range, fractionBits).convert();
     }
 
     @Override
     public Array<Vector2WithWidth> calculatePoints(Vector2 start, float lastLineWidth, Array<Vector2WithWidth> path) {
         renderCircle(path, start, target, radius, largeArc, sweep, lastLineWidth, calculateLineWidth(lastLineWidth));
-
         return path;
     }
 
     private Array<Vector2WithWidth> renderCircle(Array<Vector2WithWidth> path, Vector2 p0, Vector2 p1, float radius,
             boolean largeArc, boolean turnLeft, float startWidth, float endWidth) {
-        var r = radius;
-
-        var leftSide = (turnLeft && largeArc) || (!turnLeft && !largeArc);
-
-        var delta = p1.cpy().sub(p0).scl(0.5f);
-        var midpoint = p0.cpy().add(delta);
-
+        float r = radius;
+        boolean leftSide = (turnLeft && largeArc) || (!turnLeft && !largeArc);
+        Vector2 delta = p1.cpy().sub(p0).scl(0.5F);
+        Vector2 midpoint = p0.cpy().add(delta);
         Vector2 radiusVec = leftSide ? new Vector2(-delta.y, delta.x) : new Vector2(delta.y, -delta.x);
-
-        var lenSquared = radiusVec.len2();
-
-        if (lenSquared - 0.03f > r * r || r < 0)
+        float lenSquared = radiusVec.len2();
+        if (lenSquared - 0.03F > r * r || r < 0)
             r = (float) Math.sqrt(lenSquared);
-
-        var toCenter = radiusVec.cpy().scl((float) Math.sqrt(Math.max(0, r * r / lenSquared - 1)));
-        var center = midpoint.cpy().add(toCenter);
-
-        var angle = MathUtils.asin(MathUtils.clamp((float) Math.sqrt(lenSquared) / r, -1, 1)) * 2;
-        var arc = largeArc ? MathUtils.PI2 - angle : angle;
-
-        var pos = p0.cpy().sub(center);
-
+        Vector2 toCenter = radiusVec.cpy().scl((float) Math.sqrt(Math.max(0, r * r / lenSquared - 1)));
+        Vector2 center = midpoint.cpy().add(toCenter);
+        float angle = MathUtils.asin(MathUtils.clamp((float) Math.sqrt(lenSquared) / r, -1, 1)) * 2;
+        float arc = largeArc ? MathUtils.PI2 - angle : angle;
+        Vector2 pos = p0.cpy().sub(center);
         for (int i = 0; i < getTinyVG().getCurvePoints(); i++) {
-            var stepMat = rotationMat(i * (turnLeft ? -arc : arc) / getTinyVG().getCurvePoints());
-            var point = applyMat(stepMat, pos).add(center);
-
+            float[][] stepMat = rotationMat(i * (turnLeft ? -arc : arc) / getTinyVG().getCurvePoints());
+            Vector2 point = applyMat(stepMat, pos).add(center);
             path.add(new Vector2WithWidth(point,
                     MathUtils.lerp(startWidth, endWidth, (float) i / getTinyVG().getCurvePoints())));
         }
-
         path.add(new Vector2WithWidth(p1, endWidth));
-
         return path;
     }
 
@@ -101,15 +83,13 @@ public class UnitPathArcCircleCommand extends UnitPathCommand {
     }
 
     private float[][] rotationMat(float angle) {
-        var s = MathUtils.sin(angle);
-        var c = MathUtils.cos(angle);
-
-        var mat = new float[2][2];
+        float s = MathUtils.sin(angle);
+        float c = MathUtils.cos(angle);
+        float[][] mat = new float[2][2];
         mat[0][0] = c;
         mat[0][1] = -s;
         mat[1][0] = s;
         mat[1][1] = c;
-
         return mat;
     }
 }

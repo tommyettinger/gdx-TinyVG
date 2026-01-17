@@ -32,8 +32,8 @@ dependencies {
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     implementation "space.earlygrey:shapedrawer:$shapeDrawerVersion"
 
-    implementation "org.projectlombok:lombok:$lombokVersion"
-    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    //    implementation "org.projectlombok:lombok:$lombokVersion"
+    //    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
 
@@ -41,7 +41,7 @@ dependencies {
     testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
-    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    //    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"

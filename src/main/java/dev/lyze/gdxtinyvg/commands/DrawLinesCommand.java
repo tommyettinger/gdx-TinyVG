@@ -8,7 +8,6 @@ import dev.lyze.gdxtinyvg.enums.CommandType;
 import dev.lyze.gdxtinyvg.enums.StyleType;
 import dev.lyze.gdxtinyvg.types.UnitLine;
 import java.io.IOException;
-import lombok.var;
 
 /**
  * Draws a set of lines.
@@ -28,7 +27,7 @@ public class DrawLinesCommand extends Command {
     @Override
     public void draw(TinyVGShapeDrawer drawer) {
         drawer.setStyle(header.getPrimaryStyle());
-        for (var line : header.getData())
+        for (UnitLine line : header.getData())
             drawer.line(line, header.getLineWidth(), getTinyVG());
     }
 }

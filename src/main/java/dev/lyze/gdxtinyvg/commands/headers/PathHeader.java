@@ -11,10 +11,7 @@ import dev.lyze.gdxtinyvg.types.Unit;
 import dev.lyze.gdxtinyvg.types.Vector2WithWidth;
 import dev.lyze.gdxtinyvg.utils.StreamUtils;
 import java.io.IOException;
-import lombok.Getter;
-import lombok.var;
 
-@Getter
 public abstract class PathHeader {
     protected final TinyVG tinyVG;
     protected Style primaryStyle;
@@ -26,49 +23,55 @@ public abstract class PathHeader {
     }
 
     public void read(LittleEndianInputStream stream, StyleType primaryStyleType) throws IOException {
-        var count = StreamUtils.readVarUInt(stream) + 1;
-
+        int count = StreamUtils.readVarUInt(stream) + 1;
         primaryStyle = primaryStyleType.read(stream, tinyVG);
-
         if (!shouldCalculateTriangles())
             startLineWidth = new Unit(stream, tinyVG.getHeader().getCoordinateRange(),
                     tinyVG.getHeader().getFractionBits()).convert();
-
-        var sourceSegments = new UnitPathSegment[count];
+        UnitPathSegment[] sourceSegments = new UnitPathSegment[count];
         for (int i = 0; i < sourceSegments.length; i++)
             sourceSegments[i] = new UnitPathSegment(StreamUtils.readVarUInt(stream) + 1);
-
         for (UnitPathSegment segment : sourceSegments)
             segment.read(stream, getTinyVG());
-
         recalculateSegments(sourceSegments);
     }
 
     public void recalculateSegments() {
-        var units = new UnitPathSegment[segments.length];
+        UnitPathSegment[] units = new UnitPathSegment[segments.length];
         for (int i = 0; i < segments.length; i++)
             units[i] = segments[i].getSource();
-
         recalculateSegments(units);
     }
 
     public void recalculateSegments(UnitPathSegment[] sourceSegments) {
         segments = new ParsedPathSegment[sourceSegments.length];
-
         for (int i = 0; i < sourceSegments.length; i++) {
-            var path = sourceSegments[i].calculatePoints(startLineWidth);
-            var distinctPath = new Array<Vector2WithWidth>(path.size);
-
-            for (var point : path) {
+            Array<Vector2WithWidth> path = sourceSegments[i].calculatePoints(startLineWidth);
+            Array<Vector2WithWidth> distinctPath = new Array<Vector2WithWidth>(path.size);
+            for (Vector2WithWidth point : path) {
                 if (distinctPath.size > 0 && distinctPath.get(distinctPath.size - 1).equals(point))
                     continue;
-
                 distinctPath.add(point);
             }
-
             segments[i] = new ParsedPathSegment(sourceSegments[i], distinctPath, tinyVG, shouldCalculateTriangles());
         }
     }
 
     protected abstract boolean shouldCalculateTriangles();
+
+    public TinyVG getTinyVG() {
+        return this.tinyVG;
+    }
+
+    public Style getPrimaryStyle() {
+        return this.primaryStyle;
+    }
+
+    public float getStartLineWidth() {
+        return this.startLineWidth;
+    }
+
+    public ParsedPathSegment[] getSegments() {
+        return this.segments;
+    }
 }

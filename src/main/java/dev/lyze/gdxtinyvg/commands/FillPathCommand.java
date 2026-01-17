@@ -10,7 +10,6 @@ import dev.lyze.gdxtinyvg.drawers.TinyVGShapeDrawer;
 import dev.lyze.gdxtinyvg.enums.CommandType;
 import dev.lyze.gdxtinyvg.enums.StyleType;
 import java.io.IOException;
-import lombok.var;
 
 public class FillPathCommand extends Command {
     private PathHeader header;
@@ -28,25 +27,19 @@ public class FillPathCommand extends Command {
     @Override
     public void draw(TinyVGShapeDrawer drawer) {
         drawer.setStyle(header.getPrimaryStyle());
-
         Gdx.gl.glEnable(GL20.GL_STENCIL_TEST);
         Gdx.gl.glClear(GL20.GL_STENCIL_BUFFER_BIT);
         Gdx.gl.glColorMask(false, false, false, false);
         Gdx.gl.glStencilFunc(GL20.GL_ALWAYS, 0, -1);
         Gdx.gl.glStencilOp(GL20.GL_KEEP, GL20.GL_KEEP, GL20.GL_INCR);
-
-        for (var segment : header.getSegments())
+        for (dev.lyze.gdxtinyvg.types.ParsedPathSegment segment : header.getSegments())
             segment.getCache().filledPolygon(drawer);
-
         drawer.getBatch().flush();
-
         Gdx.gl.glColorMask(true, true, true, true);
         Gdx.gl.glStencilFunc(GL20.GL_NOTEQUAL, 0, 1); // was GL_NOTEQUAL, 2, -1
         Gdx.gl.glStencilOp(GL20.GL_KEEP, GL20.GL_KEEP, GL20.GL_KEEP);
-
-        for (var segment : header.getSegments())
+        for (dev.lyze.gdxtinyvg.types.ParsedPathSegment segment : header.getSegments())
             segment.getCache().filledPolygon(drawer);
-
         drawer.getBatch().flush();
         Gdx.gl.glDisable(GL20.GL_STENCIL_TEST);
     }

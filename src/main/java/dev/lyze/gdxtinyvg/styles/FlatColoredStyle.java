@@ -8,17 +8,12 @@ import dev.lyze.gdxtinyvg.enums.Range;
 import dev.lyze.gdxtinyvg.enums.StyleType;
 import dev.lyze.gdxtinyvg.utils.StreamUtils;
 import java.io.IOException;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * @see StyleType
  */
-@EqualsAndHashCode(callSuper = false)
-@ToString
 public class FlatColoredStyle extends Style {
-    @Getter private int colorIndex;
+    private int colorIndex;
 
     public FlatColoredStyle(TinyVG tinyVG) {
         super(tinyVG);
@@ -34,5 +29,40 @@ public class FlatColoredStyle extends Style {
         drawer.setGradientColors(getTinyVG().getColorTable()[colorIndex], getTinyVG().getColorTable()[colorIndex]);
         drawer.setGradientStyle(StyleType.FLAT);
         drawer.applyShaderValues();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof FlatColoredStyle))
+            return false;
+        final FlatColoredStyle other = (FlatColoredStyle) o;
+        if (!other.canEqual((Object) this))
+            return false;
+        if (this.getColorIndex() != other.getColorIndex())
+            return false;
+        return true;
+    }
+
+    protected boolean canEqual(final Object other) {
+        return other instanceof FlatColoredStyle;
+    }
+
+    @Override
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        result = result * PRIME + this.getColorIndex();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "FlatColoredStyle(colorIndex=" + this.getColorIndex() + ")";
+    }
+
+    public int getColorIndex() {
+        return this.colorIndex;
     }
 }

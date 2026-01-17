@@ -3,15 +3,11 @@ package dev.lyze.gdxtinyvg.enums;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.LittleEndianInputStream;
 import java.io.IOException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.var;
 
 /**
  * The color encoding defines which format the colors in the color table will
  * have.
  */
-@AllArgsConstructor
 public enum ColorEncoding {
     /**
      * Each color is a 4-tuple (red, green, blue, alpha) of bytes with the color
@@ -37,7 +33,7 @@ public enum ColorEncoding {
      */
     CUSTOM(3);
 
-    @Getter private final int value;
+    private final int value;
 
     /**
      * Converts the stored int index to the enum.
@@ -49,7 +45,6 @@ public enum ColorEncoding {
         for (ColorEncoding encoding : values())
             if (encoding.value == value)
                 return encoding;
-
         throw new IllegalArgumentException(String.valueOf(value));
     }
 
@@ -60,40 +55,42 @@ public enum ColorEncoding {
      * @return The color.
      */
     public Color read(LittleEndianInputStream stream) throws IOException {
-        var r = 0f;
-        var g = 0f;
-        var b = 0f;
-        var a = 0f;
-
+        float r = 0.0F;
+        float g = 0.0F;
+        float b = 0.0F;
+        float a = 0.0F;
         switch (this) {
             case RGBA8888:
-                r = stream.readUnsignedByte() / 255f;
-                g = stream.readUnsignedByte() / 255f;
-                b = stream.readUnsignedByte() / 255f;
-                a = stream.readUnsignedByte() / 255f;
+                r = stream.readUnsignedByte() / 255.0F;
+                g = stream.readUnsignedByte() / 255.0F;
+                b = stream.readUnsignedByte() / 255.0F;
+                a = stream.readUnsignedByte() / 255.0F;
                 break;
-
             case RGB565:
-                var num = stream.readShort();
-
-                r = (num & 0b0000_0000_0001_1111) / 31f;
-                g = ((num & 0b0000_0111_1110_0000) >> 5) / 63f;
-                b = ((num & 0b1111_1000_0000_0000) >> 11) / 31f;
+                short num = stream.readShort();
+                r = (num & 31) / 31.0F;
+                g = ((num & 2016) >> 5) / 63.0F;
+                b = ((num & 63488) >> 11) / 31.0F;
                 break;
-
             case RGBAF32:
                 r = stream.readFloat();
                 g = stream.readFloat();
                 b = stream.readFloat();
                 a = stream.readFloat();
                 break;
-
             case CUSTOM:
                 throw new IllegalArgumentException("CUSTOM Color Format not supported");
             default:
                 throw new IllegalArgumentException("Unknown Color Format enum");
         }
-
         return new Color(r, g, b, a);
+    }
+
+    private ColorEncoding(final int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return this.value;
     }
 }

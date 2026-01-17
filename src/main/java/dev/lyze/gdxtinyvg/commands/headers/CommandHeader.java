@@ -7,15 +7,11 @@ import dev.lyze.gdxtinyvg.enums.StyleType;
 import dev.lyze.gdxtinyvg.styles.Style;
 import dev.lyze.gdxtinyvg.utils.StreamUtils;
 import java.io.IOException;
-import lombok.Getter;
-import lombok.var;
 
 public abstract class CommandHeader<TData> {
-    @Getter private final Class<TData> clazz;
-
-    @Getter protected Array<TData> data;
-
-    @Getter protected Style primaryStyle;
+    private final Class<TData> clazz;
+    protected Array<TData> data;
+    protected Style primaryStyle;
 
     public CommandHeader(Class<TData> clazz) {
         this.clazz = clazz;
@@ -23,12 +19,21 @@ public abstract class CommandHeader<TData> {
 
     public CommandHeader<TData> read(LittleEndianInputStream stream, StyleType primaryStyleType, TinyVG tinyVG)
             throws IOException {
-        var count = StreamUtils.readVarUInt(stream) + 1;
-
+        int count = StreamUtils.readVarUInt(stream) + 1;
         primaryStyle = primaryStyleType.read(stream, tinyVG);
-
         data = new Array<>(count);
-
         return this;
+    }
+
+    public Class<TData> getClazz() {
+        return this.clazz;
+    }
+
+    public Array<TData> getData() {
+        return this.data;
+    }
+
+    public Style getPrimaryStyle() {
+        return this.primaryStyle;
     }
 }

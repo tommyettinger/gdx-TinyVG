@@ -10,80 +10,72 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import dev.lyze.gdxtinyvg.commands.Command;
 import dev.lyze.gdxtinyvg.drawers.TinyVGShapeDrawer;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.var;
 
 public class TinyVG {
     /**
      * Each TVG file starts with a header defining some global values for the file
      * like scale and image size.
      */
-    @Getter private final TinyVGHeader header;
+    private final TinyVGHeader header;
     /**
      * The color table encodes the palette for this file. It’s binary content is
      * defined by the color_encoding field in the header. For the three defined
      * color encodings, each will yield a list of color_count RGBA tuples.
      */
-    @Getter private final Color[] colorTable;
-
+    private final Color[] colorTable;
     /**
      * TinyVG files contain a sequence of draw commands that must be executed in the
      * defined order to get the final result. Each draw command adds a new 2D
      * primitive to the graphic.
      */
-    @Getter private final Array<Command> commands = new Array<>();
-
+    private final Array<Command> commands = new Array<>();
     /**
      * Global position offset value.
      */
-    @Getter private float positionX, positionY;
-
+    private float positionX;
+    private float positionY;
     /**
      * Global scale value.
      */
-    @Getter private float scaleX = 1, scaleY = 1;
-
-    /***
+    private float scaleX = 1;
+    private float scaleY = 1;
+    /**
      * Global rotation value.
      */
-    @Getter private float rotation;
-    /***
+    private float rotation;
+    /**
      * Global origin value.
      */
-    @Getter private float originX, originY;
-
-    /***
+    private float originX;
+    private float originY;
+    /**
      * Global shear value.
      */
-    @Getter private float shearX, shearY;
-
+    private float shearX;
+    private float shearY;
     /**
      * Amount of points every curve generates.
      */
-    @Getter private int curvePoints = 24;
-
+    private int curvePoints = 24;
     /**
      * Clips the TVG based on the provided image size. Requires depth buffer.
      */
-    @Getter @Setter private boolean clipBasedOnTVGSize = true;
-
+    private boolean clipBasedOnTVGSize = true;
     /**
      * Next time render gets called and the tvg is dirty, it recalculates all point
      * positions in paths. (Slow)
      */
-    @Getter private boolean dirtyCurves;
+    private boolean dirtyCurves;
     /**
      * Next time render gets called and the tvg is dirty, it recalculates the
      * transformation matrix. (Fast)
      */
-    @Getter private boolean dirtyTransformationMatrix;
-
+    private boolean dirtyTransformationMatrix;
     private final Matrix4 backupBatchTransform = new Matrix4();
     private final Matrix4 computedTransform = new Matrix4();
     private final Matrix4 compositeTransform = new Matrix4();
     private final Matrix4 bufferTransform = new Matrix4();
-    @Getter private final Affine2 affine = new Affine2();
+    private final Affine2 affine = new Affine2();
 
     public TinyVG(TinyVGHeader header, Color[] colorTable) {
         this.header = header;
@@ -95,50 +87,37 @@ public class TinyVG {
      */
     public void draw(TinyVGShapeDrawer drawer) {
         backupBatchTransform.set(drawer.getBatch().getTransformMatrix());
-
         if (dirtyTransformationMatrix) {
             updateTransformationMatrix();
             dirtyTransformationMatrix = false;
         }
-
         compositeTransform.set(backupBatchTransform);
         compositeTransform.mul(computedTransform);
-
         drawer.getBatch().setTransformMatrix(compositeTransform);
-
         if (clipBasedOnTVGSize) {
             Gdx.gl.glDepthMask(true);
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
-
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthFunc(GL20.GL_ALWAYS);
-
             Gdx.gl.glColorMask(false, false, false, false);
-
             drawer.filledRectangle(0, 0, getUnscaledWidth(), getUnscaledHeight());
             drawer.getBatch().flush();
         }
-
         drawer.beginShader();
-
         if (clipBasedOnTVGSize) {
             Gdx.gl.glColorMask(true, true, true, true);
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthFunc(GL20.GL_EQUAL);
         }
-
         for (Command command : commands) {
             if (dirtyCurves)
                 command.onPropertiesChanged();
             command.draw(drawer);
         }
         dirtyCurves = false;
-
         drawer.getBatch().flush();
         drawer.getBatch().setTransformMatrix(backupBatchTransform);
-
         drawer.endShader();
-
         if (clipBasedOnTVGSize) {
             Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(false);
@@ -150,16 +129,12 @@ public class TinyVG {
      */
     public void drawBoundingBox(TinyVGShapeDrawer drawer, Color color) {
         backupBatchTransform.set(drawer.getBatch().getTransformMatrix());
-
         if (dirtyTransformationMatrix) {
             updateTransformationMatrix();
             dirtyTransformationMatrix = false;
         }
-
         drawer.getBatch().setTransformMatrix(computedTransform);
-
         drawer.rectangle(0, 0, getUnscaledWidth(), getUnscaledHeight(), color);
-
         drawer.getBatch().setTransformMatrix(backupBatchTransform);
     }
 
@@ -171,36 +146,25 @@ public class TinyVG {
             updateTransformationMatrix();
             dirtyTransformationMatrix = false;
         }
-
-        var pointX = point.x;
-        var pointY = point.y;
-
+        float pointX = point.x;
+        float pointY = point.y;
         point.set(0, 0);
         affine.applyTo(point);
-
-        var topLeftX = point.x;
-        var topLeftY = point.y;
-
+        float topLeftX = point.x;
+        float topLeftY = point.y;
         point.set(getUnscaledWidth(), 0);
         affine.applyTo(point);
-
-        var topRightX = point.x;
-        var topRightY = point.y;
-
+        float topRightX = point.x;
+        float topRightY = point.y;
         point.set(0, getUnscaledHeight());
         affine.applyTo(point);
-
-        var bottomLeftX = point.x;
-        var bottomLeftY = point.y;
-
+        float bottomLeftX = point.x;
+        float bottomLeftY = point.y;
         point.set(getUnscaledWidth(), getUnscaledHeight());
         affine.applyTo(point);
-
-        var bottomRightX = point.x;
-        var bottomRightY = point.y;
-
+        float bottomRightX = point.x;
+        float bottomRightY = point.y;
         point.set(pointX, pointY);
-
         return Intersector.isPointInTriangle(pointX, pointY, topLeftX, topLeftY, topRightX, topRightY, bottomRightX,
                 bottomRightY)
                 || Intersector.isPointInTriangle(pointX, pointY, topLeftX, topLeftY, bottomLeftX, bottomLeftY,
@@ -215,7 +179,6 @@ public class TinyVG {
         affine.scale(scaleX, scaleY);
         affine.rotate(rotation);
         affine.translate(-originX, -originY);
-
         computedTransform.set(affine);
     }
 
@@ -229,7 +192,6 @@ public class TinyVG {
     public void setSize(float width, float height) {
         scaleX = width / header.getWidth();
         scaleY = height / header.getHeight();
-
         dirtyTransformationMatrix = true;
     }
 
@@ -238,7 +200,6 @@ public class TinyVG {
      */
     public void setScale(float scale) {
         setScale(scale, scale);
-
         dirtyTransformationMatrix = true;
     }
 
@@ -248,7 +209,6 @@ public class TinyVG {
     public void setScale(float scaleX, float scaleY) {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
-
         dirtyTransformationMatrix = true;
     }
 
@@ -258,7 +218,6 @@ public class TinyVG {
     public void setPosition(float x, float y) {
         this.positionX = x;
         this.positionY = y;
-
         dirtyTransformationMatrix = true;
     }
 
@@ -276,7 +235,6 @@ public class TinyVG {
     public void setOrigin(float x, float y) {
         this.originX = x;
         this.originY = y;
-
         dirtyTransformationMatrix = true;
     }
 
@@ -286,7 +244,6 @@ public class TinyVG {
     public void setShear(float x, float y) {
         this.shearX = x;
         this.shearY = y;
-
         dirtyTransformationMatrix = true;
     }
 
@@ -296,62 +253,52 @@ public class TinyVG {
      */
     public void setCurvePoints(int curvePoints) {
         this.curvePoints = curvePoints;
-
         dirtyCurves = true;
         dirtyTransformationMatrix = true;
     }
 
     public void setRotation(float rotation) {
         this.rotation = rotation % 360;
-
         dirtyTransformationMatrix = true;
     }
 
     public void setShearY(float shearY) {
         this.shearY = shearY;
-
         dirtyTransformationMatrix = true;
     }
 
     public void setShearX(float shearX) {
         this.shearX = shearX;
-
         dirtyTransformationMatrix = true;
     }
 
     public void setScaleY(float scaleY) {
         this.scaleY = scaleY;
-
         dirtyTransformationMatrix = true;
     }
 
     public void setScaleX(float scaleX) {
         this.scaleX = scaleX;
-
         dirtyTransformationMatrix = true;
     }
 
     public void setPositionY(float positionY) {
         this.positionY = positionY;
-
         dirtyTransformationMatrix = true;
     }
 
     public void setPositionX(float positionX) {
         this.positionX = positionX;
-
         dirtyTransformationMatrix = true;
     }
 
     public void setOriginX(float originX) {
         this.originX = originX;
-
         dirtyTransformationMatrix = true;
     }
 
     public void setOriginY(float originY) {
         this.originY = originY;
-
         dirtyTransformationMatrix = true;
     }
 
@@ -384,6 +331,124 @@ public class TinyVG {
     }
 
     public void centerOrigin() {
-        setOrigin(getUnscaledWidth() / 2f, getUnscaledHeight() / 2f);
+        setOrigin(getUnscaledWidth() / 2.0F, getUnscaledHeight() / 2.0F);
+    }
+
+    /**
+     * Each TVG file starts with a header defining some global values for the file
+     * like scale and image size.
+     */
+    public TinyVGHeader getHeader() {
+        return this.header;
+    }
+
+    /**
+     * The color table encodes the palette for this file. It’s binary content is
+     * defined by the color_encoding field in the header. For the three defined
+     * color encodings, each will yield a list of color_count RGBA tuples.
+     */
+    public Color[] getColorTable() {
+        return this.colorTable;
+    }
+
+    /**
+     * TinyVG files contain a sequence of draw commands that must be executed in the
+     * defined order to get the final result. Each draw command adds a new 2D
+     * primitive to the graphic.
+     */
+    public Array<Command> getCommands() {
+        return this.commands;
+    }
+
+    /**
+     * Global position offset value.
+     */
+    public float getPositionX() {
+        return this.positionX;
+    }
+
+    public float getPositionY() {
+        return this.positionY;
+    }
+
+    /**
+     * Global scale value.
+     */
+    public float getScaleX() {
+        return this.scaleX;
+    }
+
+    public float getScaleY() {
+        return this.scaleY;
+    }
+
+    /**
+     * Global rotation value.
+     */
+    public float getRotation() {
+        return this.rotation;
+    }
+
+    /**
+     * Global origin value.
+     */
+    public float getOriginX() {
+        return this.originX;
+    }
+
+    public float getOriginY() {
+        return this.originY;
+    }
+
+    /**
+     * Global shear value.
+     */
+    public float getShearX() {
+        return this.shearX;
+    }
+
+    public float getShearY() {
+        return this.shearY;
+    }
+
+    /**
+     * Amount of points every curve generates.
+     */
+    public int getCurvePoints() {
+        return this.curvePoints;
+    }
+
+    /**
+     * Clips the TVG based on the provided image size. Requires depth buffer.
+     */
+    public boolean isClipBasedOnTVGSize() {
+        return this.clipBasedOnTVGSize;
+    }
+
+    /**
+     * Clips the TVG based on the provided image size. Requires depth buffer.
+     */
+    public void setClipBasedOnTVGSize(final boolean clipBasedOnTVGSize) {
+        this.clipBasedOnTVGSize = clipBasedOnTVGSize;
+    }
+
+    /**
+     * Next time render gets called and the tvg is dirty, it recalculates all point
+     * positions in paths. (Slow)
+     */
+    public boolean isDirtyCurves() {
+        return this.dirtyCurves;
+    }
+
+    /**
+     * Next time render gets called and the tvg is dirty, it recalculates the
+     * transformation matrix. (Fast)
+     */
+    public boolean isDirtyTransformationMatrix() {
+        return this.dirtyTransformationMatrix;
+    }
+
+    public Affine2 getAffine() {
+        return this.affine;
     }
 }
